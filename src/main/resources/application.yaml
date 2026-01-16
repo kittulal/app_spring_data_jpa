@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: app_spring_data_jpa
