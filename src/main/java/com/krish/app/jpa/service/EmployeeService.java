@@ -59,8 +59,11 @@ public class EmployeeService {
         emp.setDepartment(dept);
     }
 
-    public List<Employee> getEmployeesByFilters(EmployeeFilterRequest filter) {
-        return employeeRepo.findEmployeesByDynamicFilters(filter);
+    public List<EmployeeResponseDto> getEmployeesByFilters(EmployeeFilterRequest filter) {
+        List<Employee> employeeList = employeeRepo.findEmployeesByDynamicFilters(filter);
+        return employeeList.stream()
+                .map(EmployeeMapper::mapToDto)
+                .toList();
     }
 
 

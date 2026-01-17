@@ -24,22 +24,21 @@ public class EmployeeRepositoryCustomImpl implements EmployeeRepositoryCustom {
         CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
 
         Root<Employee> employee = cq.from(Employee.class);
-        Join<Employee, Department> department = employee.join("department", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
         // employee.firstName
-        if (filter.getFirstName() != null && !filter.getFirstName().isEmpty()) {
+        if (hasText(filter.getFirstName())) {
             predicates.add(
-                    cb.like(
+                    cb.equal(
                             cb.lower(employee.get("firstName")),
-                            "%" + filter.getFirstName().toLowerCase() + "%"
+                            filter.getFirstName().toLowerCase()
                     )
             );
         }
 
         // employee.lastName
-        if (filter.getLastName() != null && !filter.getLastName().isEmpty()) {
+        if (hasText(filter.getLastName())) {
             predicates.add(
                     cb.like(
                             cb.lower(employee.get("lastName")),
@@ -49,24 +48,27 @@ public class EmployeeRepositoryCustomImpl implements EmployeeRepositoryCustom {
         }
 
         // employee.email
-        if (filter.getEmail() != null && !filter.getEmail().isEmpty()) {
+        if (hasText(filter.getEmail())) {
             predicates.add(
-                    cb.like(
+                    cb.equal(
                             cb.lower(employee.get("email")),
-                            "%" + filter.getEmail().toLowerCase() + "%"
+                            filter.getEmail().toLowerCase()
                     )
             );
         }
 
         // employee.status
-        if (filter.getStatus() != null && !filter.getStatus().isEmpty()) {
+        if (hasText(filter.getStatus())) {
             predicates.add(
                     cb.equal(employee.get("status"), filter.getStatus())
             );
         }
 
-        // department.name
-        if (filter.getDepartmentName() != null && !filter.getDepartmentName().isEmpty()) {
+        // ✅ JOIN ONLY WHEN REQUIRED
+        if (hasText(filter.getDepartmentName())) {
+            Join<Employee, Department> department =
+                    employee.join("department", JoinType.INNER);
+
             predicates.add(
                     cb.like(
                             cb.lower(department.get("name")),
@@ -75,8 +77,15 @@ public class EmployeeRepositoryCustomImpl implements EmployeeRepositoryCustom {
             );
         }
 
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-        cq.orderBy(cb.asc(employee.get("firstName")));
+        cq.select(employee)
+                .distinct(true) // ⭐ VERY IMPORTANT
+                .where(cb.and(predicates.toArray(new Predicate[0])))
+                .orderBy(cb.asc(employee.get("firstName")));
+
         return entityManager.createQuery(cq).getResultList();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

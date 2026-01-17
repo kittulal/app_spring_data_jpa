@@ -5,6 +5,7 @@ import com.krish.app.jpa.dto.EmployeeFilterRequest;
 import com.krish.app.jpa.dto.EmployeeResponseDto;
 import com.krish.app.jpa.entity.Employee;
 import com.krish.app.jpa.service.EmployeeService;
+import com.krish.app.jpa.utils.EmployeeMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/search")
-    public List<Employee> searchEmployees(
+    public List<EmployeeResponseDto> searchEmployees(
             @RequestBody EmployeeFilterRequest filter) {
         return service.getEmployeesByFilters(filter);
     }
