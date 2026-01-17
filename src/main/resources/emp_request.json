@@ -1,0 +1,11 @@
+{
+  "empCode": "EMP101",
+  "firstName": "Ravi",
+  "lastName": "Kumar",
+  "email": "ravi.kumar@company.com",
+  "salary": 85000,
+  "designation": "Software Engineer",
+  "joiningDate": "2024-01-15",
+  "status": "ACTIVE",
+  "departmentId": 1
+}
